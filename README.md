@@ -66,7 +66,17 @@ flowchart LR
 
 ## 📊 Results (prototype v0.1)
 
-RESULTS_PLACEHOLDER
+**Baseline run** (balanced subset of 6,000 images, 7 minutes on a laptop CPU), tested on **900 images the model never saw**:
+
+| Accuracy | Precision | Recall | F1-score | Missed infections |
+|:--------:|:---------:|:------:|:--------:|:-----------------:|
+| **92.7%** | **95.5%** | **89.6%** | **92.4%** | 47 of 450 |
+
+<img src="outputs/confusion_matrix.png" alt="Confusion matrix" width="38%"> <img src="outputs/training_curves.png" alt="Training curves" width="60%">
+
+The baseline showed that plain histogram equalisation over-darkens cells and that the model was still improving, so v0.1 switches to CLAHE and fine-tunes longer. Updated numbers follow when that run finishes.
+
+**Stain-spot highlighting (Stages 6-8)**, measured on 800 random cells: a spot is outlined in **87%** of infected cells and wrongly outlined in only **3%** of healthy ones.
 
 ---
 
