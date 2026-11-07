@@ -30,7 +30,7 @@ Read it once, then present from the live demo (`streamlit run app.py`).
 | 1 | Load the image | "We read the microscope image with OpenCV and show it with Matplotlib." | M1 |
 | 2 | Crop + resize | "Images come in different sizes, so we cut off the empty black border and resize every cell to 128 x 128." | M2 |
 | 3 | Colour spaces | "Grayscale tells us brightness, so we use it to find the cell. HSV separates colour strength (saturation), and the purple stain glows brightly there." | M2 |
-| 4 | Histogram equalisation | "Some slides are darker than others. Equalising the brightness histogram spreads the values out, so every image gets similar contrast." | M3 |
+| 4 | Histogram equalisation (CLAHE) | "Some slides are darker than others. Equalising the brightness histogram spreads the values out, so every image gets similar contrast. We use the contrast-limited version, CLAHE, which works on small tiles and caps how much contrast it adds." | M3 |
 | 5 | Median filter | "A median filter removes tiny specks of noise but keeps edges sharp. The Gaussian and average filters are also selectable in the demo." | M3 |
 | 6 | Otsu thresholding | "Otsu chooses the threshold automatically from the histogram. We use it twice: first to separate the cell from the background, then to separate stained pixels from normal ones." | M4 |
 | 7 | Erosion + dilation | "Thresholding leaves small noisy dots. Erosion removes them and dilation grows the real regions back to size." | M2 |
@@ -55,6 +55,7 @@ _Filled in after training: see section below._
 ## 7. Questions the faculty may ask
 
 - **Why HSV and not RGB?** In RGB, brightness and colour are mixed into all three channels. HSV keeps colour strength (S) separate from brightness (V), so the purple stain stands out in one channel.
+- **Why CLAHE and not plain histogram equalisation?** We tried plain `equalizeHist` first. It stretched each cell's darkest pixels to almost black, so Otsu then mistook parts of the cell for background. CLAHE equalises small tiles and limits the contrast boost, which keeps the cell intact. Both are histogram-based enhancement (Module 3).
 - **Why Otsu?** It picks the threshold from each image's own histogram, so it adapts to darker or lighter slides instead of using one fixed number.
 - **Why median and not Gaussian?** The median removes isolated noisy pixels without blurring the edge of the parasite. Gaussian smooths everything, including the edges we need.
 - **Why transfer learning and not a CNN from scratch?** A CNN trained from scratch needs far more images and time. A pre-trained network already knows basic shapes and textures, so it learns our task quickly and accurately on a laptop.

@@ -102,18 +102,26 @@ def histogram_figure(image_path, path):
         ax_hist.set_title(f"{title}: brightness histogram (cell pixels)", fontsize=10)
         ax_hist.set_xlim(0, 255)
         ax_hist.set_xlabel("brightness (V channel)")
-    fig.suptitle("Stage 4 - Histogram equalisation spreads brightness over the full range",
+    fig.suptitle("Stage 4 - CLAHE histogram equalisation spreads brightness for better contrast",
                  fontsize=12, fontweight="bold")
     fig.tight_layout()
     fig.savefig(path, dpi=130)
     plt.close(fig)
 
 
-def pick_example(name, index=1):
-    sample = SAMPLES / f"{name.lower()}_{index}.png"
-    if sample.exists():
-        return sample
-    return sorted((DATA / name).glob("*.png"))[0]
+def pick_example(name, model=None):
+    """A typical example for the figures: a test-set sample where Stages 6-8
+    and the CNN both behave as expected for its class."""
+    candidates = (sorted(SAMPLES.glob(f"{name.lower()}_*.png"))
+                  or sorted((DATA / name).glob("*.png"))[:50])
+    for path in candidates:
+        r = run_pipeline(load_image(path))
+        ok = bool(r.spot_contours) == (name == "Parasitized")
+        if model is not None:
+            ok = ok and predict(model, r.cnn_input)[0] == name
+        if ok:
+            return path
+    return candidates[0]
 
 
 def main():
@@ -122,8 +130,8 @@ def main():
     if DATA.exists():
         dataset_overview(OUT / "dataset_overview.png")
     for name in CLASSES:
-        pipeline_figure(pick_example(name), OUT / f"pipeline_{name.lower()}.png", model)
-    histogram_figure(pick_example("Parasitized"), OUT / "histogram_equalisation.png")
+        pipeline_figure(pick_example(name, model), OUT / f"pipeline_{name.lower()}.png", model)
+    histogram_figure(pick_example("Parasitized", model), OUT / "histogram_equalisation.png")
     print("Figures saved to", OUT)
 
 

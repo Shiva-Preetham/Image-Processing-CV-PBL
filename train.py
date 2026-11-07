@@ -44,8 +44,8 @@ def parse_args():
     p.add_argument("--data", default=ROOT / "data" / "cell_images", type=Path)
     p.add_argument("--per-class", default=3000, type=int, help="images per class, 0 = all")
     p.add_argument("--epochs-head", default=2, type=int, help="Phase A epochs")
-    p.add_argument("--epochs-finetune", default=3, type=int, help="Phase B epochs")
-    p.add_argument("--finetune-blocks", default=5, type=int)
+    p.add_argument("--epochs-finetune", default=5, type=int, help="Phase B epochs")
+    p.add_argument("--finetune-blocks", default=8, type=int)
     p.add_argument("--batch-size", default=64, type=int)
     p.add_argument("--seed", default=42, type=int)
     return p.parse_args()
@@ -120,6 +120,7 @@ def plot_history(history, path):
     n_head = sum(h["phase"].startswith("Phase A") for h in history)
     for a, title in zip(ax, ("Loss (lower is better)", "Accuracy (higher is better)")):
         a.axvline(n_head + 0.5, color="gray", ls="--", lw=1)
+        a.set_xticks(list(ep))
         a.set_title(title)
         a.set_xlabel("Epoch  (dashed line: start of fine-tuning)")
         a.legend()

@@ -188,7 +188,7 @@ with tab_map:
          "Module": "M2", "CO": "CO1"},
         {"Stage": "3. Colour spaces", "Technique": "RGB -> Grayscale, RGB -> HSV",
          "Module": "M2", "CO": "CO1"},
-        {"Stage": "4. Enhancement", "Technique": "Histogram equalisation (V channel)",
+        {"Stage": "4. Enhancement", "Technique": "CLAHE histogram equalisation (V channel)",
          "Module": "M3", "CO": "CO2"},
         {"Stage": "5. Noise removal", "Technique": "Median / Gaussian / Average filter",
          "Module": "M3", "CO": "CO2"},

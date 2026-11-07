@@ -80,12 +80,19 @@ def to_hsv(rgb):
 # --------------------------------------------------------------------------
 # Stage 4 (Module 3): histogram-based enhancement
 # --------------------------------------------------------------------------
+CLAHE = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
+
+
 def enhance_contrast(rgb):
-    """Histogram equalisation on the V (brightness) channel only.
-    Stretching V spreads out the brightness levels (better contrast) while
-    H and S are untouched, so the stain colour is preserved."""
+    """Histogram equalisation on the V (brightness) channel only, so the
+    stain colour (H and S) is preserved.
+
+    We use CLAHE (Contrast Limited Adaptive Histogram Equalisation): it
+    equalises the histogram of small 8x8 tiles and caps how much contrast it
+    may add. Plain cv2.equalizeHist stretched each cell's darkest pixels to
+    almost black, which broke the Otsu cell mask in Stage 6."""
     h, s, v = cv2.split(to_hsv(rgb))
-    v = cv2.equalizeHist(v)
+    v = CLAHE.apply(v)
     return cv2.cvtColor(cv2.merge([h, s, v]), cv2.COLOR_HSV2RGB)
 
 

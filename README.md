@@ -54,7 +54,7 @@ flowchart LR
 | 1 | Load | Read the microscope image and display it | `cv2.imread`, Matplotlib | **M1** |
 | 2 | Crop + resize | Cut off the black border, make every image 128 × 128 | Bounding box, `cv2.resize` | **M2** |
 | 3 | Colour spaces | Grayscale for brightness; HSV saturation makes the purple stain glow | `cv2.cvtColor` | **M2** |
-| 4 | Enhancement | Spread brightness over the full range so every slide has similar contrast | Histogram equalisation (V channel) | **M3** |
+| 4 | Enhancement | Spread brightness out so every slide has similar contrast | CLAHE histogram equalisation (V channel) | **M3** |
 | 5 | Noise removal | Remove tiny specks while keeping edges sharp | Median filter (Gaussian / Average selectable) | **M3** |
 | 6 | Segmentation | Pick thresholds automatically: cell vs. background, then stained vs. normal | Otsu thresholding | **M4** |
 | 7 | Mask cleanup | Delete small noisy dots, keep the real regions | Erosion + dilation | **M2** |
