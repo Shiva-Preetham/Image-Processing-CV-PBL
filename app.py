@@ -45,8 +45,10 @@ def get_model():
 
 
 def big(img, size=256):
-    """Enlarge the 128 px images so they are easy to see on a projector."""
-    return cv2.resize(img, (size, size), interpolation=cv2.INTER_NEAREST)
+    """Enlarge small images (keeping their shape) so they are easy to see on a projector."""
+    h, w = img.shape[:2]
+    scale = size / max(h, w)
+    return cv2.resize(img, (round(w * scale), round(h * scale)), interpolation=cv2.INTER_NEAREST)
 
 
 def sample_files():
