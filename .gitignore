@@ -1,0 +1,20 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.ipynb_checkpoints/
+
+# Dataset (337 MB - download it with the steps in README.md)
+data/
+*.zip
+
+# Editors / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Local tool settings
+.claude/
+.streamlit/secrets.toml

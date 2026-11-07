@@ -1,0 +1,15 @@
+# MalariaVision - Python 3.11
+# Core image processing (Module 1: Python, OpenCV, NumPy, Matplotlib)
+opencv-python>=4.9
+numpy>=1.26
+matplotlib>=3.8
+
+# Transfer learning with a pre-trained CNN (Module 5)
+torch>=2.2
+torchvision>=0.17
+
+# Evaluation metrics: accuracy, precision, recall, F1, confusion matrix
+scikit-learn>=1.4
+
+# Demo web page for showing the pipeline step by step (display only)
+streamlit>=1.35
