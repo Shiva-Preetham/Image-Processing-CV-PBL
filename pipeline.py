@@ -162,9 +162,9 @@ def find_contours(mask, min_area=0):
 # Full analysis: runs Stages 1-8 and keeps every intermediate image
 # --------------------------------------------------------------------------
 # Stain-spot settings (for a 128 x 128 cell image)
-RIM_ERODE = 9          # ignore the dark cell membrane at the edge
+RIM_ERODE = 5          # ignore the thin dark membrane at the cell edge
 MIN_SPOT_AREA = 12     # px: smaller blobs are treated as noise
-MIN_STAIN_GAP = 35     # spot must be clearly more stained than the cell body
+MIN_STAIN_GAP = 20     # spot must be clearly more stained than the cell body
 
 
 @dataclass
@@ -206,13 +206,21 @@ def run_pipeline(rgb, filter_method="Median", ksize=3, morph_ksize=3):
     r.otsu_cell, cell_mask = otsu_threshold(gray_f)
     r.steps["6_cell_mask_raw"] = cell_mask
 
-    # Stage 7a - morphology to clean the cell mask, keep the largest blob
+    # Stage 7a - morphology to clean the cell mask, keep the largest blob.
+    # A dark parasite on the cell edge can fall below the threshold and leave a
+    # notch, so the cell outline is wrapped in its convex hull ("rubber band"),
+    # which puts the parasite back inside the cell. The pure-black padding
+    # around the cell (see Stage 2) is then removed again.
     cell_mask = fill_holes(clean_mask(cell_mask, morph_ksize), 7)
     cells = find_contours(cell_mask)
     solid_cell = np.zeros_like(cell_mask)
     if cells:
-        r.cell_contour = max(cells, key=cv2.contourArea)
-        cv2.drawContours(solid_cell, [r.cell_contour], -1, 255, thickness=cv2.FILLED)
+        hull = cv2.convexHull(max(cells, key=cv2.contourArea))
+        cv2.drawContours(solid_cell, [hull], -1, 255, thickness=cv2.FILLED)
+        solid_cell[r.steps["3_gray"] <= 10] = 0
+        outline = find_contours(solid_cell)
+        if outline:
+            r.cell_contour = max(outline, key=cv2.contourArea)
     r.steps["7_cell_mask"] = solid_cell
 
     # Stage 6b - Otsu on the Saturation channel, inside the cell only
