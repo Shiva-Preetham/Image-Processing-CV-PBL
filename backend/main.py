@@ -21,7 +21,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
 from backend.model import OnnxClassifier
-from pipeline import FILTERS, STEPS, decode_image, load_image, run_pipeline, to_hsv
+from pipeline import (FILTERS, MIN_STAIN_GAP, STEPS, decode_image, load_image, run_pipeline,
+                      to_hsv)
 
 ROOT = Path(__file__).resolve().parent.parent
 SAMPLES = ROOT / "samples"
@@ -87,7 +88,7 @@ def analyze(rgb, filter_method, ksize, morph, ground_truth=None):
         "ground_truth": ground_truth,
         "segmentation": {"spots": len(r.spot_contours), "spot_area": r.spot_area,
                          "otsu_cell": float(r.otsu_cell), "otsu_stain": float(r.otsu_stain),
-                         "stain_gap": r.stain_gap},
+                         "stain_gap": r.stain_gap, "min_stain_gap": MIN_STAIN_GAP},
         "steps": [{"key": key, "title": title, "module": module, "note": note,
                    "image": png_data_url(r.steps[key])}
                   for key, title, module, note in STEPS],
