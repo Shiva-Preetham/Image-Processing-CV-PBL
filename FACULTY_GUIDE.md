@@ -1,7 +1,7 @@
 # Presenting MalariaVision to the Lab Faculty
 
 A 5-minute talk track for the prototype review, written in plain words.
-Read it once, then present from the web app (live link in the README).
+Read it once, then present from the web app: **https://malariavision.vercel.app**
 
 **Before the review:** open the web app about a minute early. The free server sleeps when nobody uses it, and the first visit wakes it up. If there is no internet, run it locally (README, "Quick start") or use the one-command backup: `streamlit run app.py`.
 

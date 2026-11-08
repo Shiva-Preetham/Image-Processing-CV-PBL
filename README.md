@@ -12,6 +12,8 @@
 ![React](https://img.shields.io/badge/Web-React_19-61DAFB?logo=react&logoColor=black)
 ![Status](https://img.shields.io/badge/status-prototype%20v0.1-orange)
 
+[![Live demo](https://img.shields.io/badge/🌐_Live_demo-malariavision.vercel.app-6d3fc0?style=for-the-badge&logo=vercel&logoColor=white)](https://malariavision.vercel.app)
+
 **Project-based learning · Fundamental of Image Processing and Computer Vision Lab (26B16CS316) · 2026-27**
 
 <img src="outputs/pipeline_parasitized.png" alt="Every pipeline stage on an infected cell" width="100%">
@@ -97,6 +99,8 @@ Plain histogram equalisation stretched each cell's darkest pixels to almost blac
 
 ## 🖥️ Web app
 
+**Try it: https://malariavision.vercel.app** (API docs: https://malariavision-api.onrender.com/docs)
+
 A React web app shows the whole pipeline live, in three tabs:
 
 - **🔍 Live diagnosis**: pick one of 12 test-set cells (or drag in your own image) and see all 10 stages, the stained-spot outline, the brightness histograms, the thresholds Otsu chose and the CNN's verdict. Switch the noise filter (Median / Gaussian / Average) and kernel sizes to see how each stage reacts.
@@ -180,10 +184,10 @@ python -m pytest tests -q        # API checks
 
 ## ☁️ Deployment
 
-| Part | Host | Config |
-|------|------|--------|
-| API (`backend/`) | [Render](https://render.com) free web service | [`render.yaml`](render.yaml) |
-| Web app (`frontend/`) | [Vercel](https://vercel.com) | Vite preset, root directory `frontend` |
+| Part | Host | Live URL | Config |
+|------|------|----------|--------|
+| Web app (`frontend/`) | [Vercel](https://vercel.com) | https://malariavision.vercel.app | Vite preset, root directory `frontend` |
+| API (`backend/`) | [Render](https://render.com) free web service (Singapore) | https://malariavision-api.onrender.com | [`render.yaml`](render.yaml) |
 
 1. **Render**: *New → Blueprint →* pick this repository *→ Apply*. Render reads `render.yaml`, installs `backend/requirements.txt` (no PyTorch) and starts the API. Check `https://<your-service>.onrender.com/api/health`.
 2. **Vercel**: *Add New → Project →* import this repository, set **Root Directory** to `frontend`, keep the Vite preset and deploy. If your Render URL is not `https://malariavision-api.onrender.com`, add an environment variable `VITE_API_URL` with your Render URL before deploying.
