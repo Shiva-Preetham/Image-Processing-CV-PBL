@@ -50,13 +50,14 @@ Show `outputs/confusion_matrix.png` and `outputs/training_curves.png` (or the **
 
 ## 6. Live demo script (2 minutes)
 
-1. Open the **Live diagnosis** tab and pick **Parasitized #1**.
-   Point at the red outline: "Stages 6 to 8 found the stained spot." Then point at the verdict card: "The CNN agrees: Parasitized, with this confidence."
+1. The **Live diagnosis** tab opens on **Parasitized #2**.
+   Point at the red outlines: "Stages 6 to 8 found two stained spots." Then point at the verdict card: "The CNN agrees: Parasitized, 99.4% confident."
 2. Switch to **Uninfected #1**: no red spot, and a green verdict.
-3. Scroll through the 10 step images: "Each picture is one syllabus topic, labelled with its module."
-4. In the sidebar, change the filter from **Median** to **Gaussian** and raise the kernel size to 7. The images get blurrier and the spot outline changes. "This is why we chose a small median filter."
-5. Open **Model performance**: read out recall and the number of missed infections.
-6. Open **Syllabus map**: "Every stage maps to Modules 1 to 5."
+3. Be honest about a miss: switch to **Parasitized #1**. "This cell is labelled infected, but its stain is faint and spread out, with no dark dot. Both our spot detector and the CNN call it healthy. It is one of the 22 infected cells we miss, and it is why we report recall, not just accuracy." (The other 11 sample cells are all classified correctly.)
+4. Go back to **Parasitized #2** and scroll through the 10 step images: "Each picture is one syllabus topic, labelled with its module."
+5. In the sidebar, change the filter from **Median** to **Gaussian** and raise the kernel size to 7. The images get blurrier and the spot outline changes. "This is why we chose a small median filter."
+6. Open **Model performance**: read out recall and the number of missed infections.
+7. Open **Syllabus map**: "Every stage maps to Modules 1 to 5."
 
 ## 7. Questions the faculty may ask
 

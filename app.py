@@ -65,7 +65,11 @@ source = st.sidebar.radio("Cell image", ["Test-set sample", "Upload an image"],
 rgb, true_label, image_name = None, None, None
 if source == "Test-set sample" and samples:
     names = {f"{p.stem.split('_')[0].title()}  #{p.stem.split('_')[1]}": p for p in samples}
-    choice = st.sidebar.selectbox("Choose a sample (never seen in training)", list(names))
+    labels = list(names)
+    # Open on a typical infected cell; Parasitized #1 is a known hard case (see FACULTY_GUIDE.md)
+    default = labels.index("Parasitized  #2") if "Parasitized  #2" in labels else 0
+    choice = st.sidebar.selectbox("Choose a sample (never seen in training)", labels,
+                                  index=default)
     rgb = load_image(names[choice])
     true_label, image_name = choice.split()[0], names[choice].name
 else:
@@ -181,25 +185,18 @@ with tab_perf:
 # ------------------------------ syllabus map ---------------------------
 with tab_map:
     st.markdown("Every stage uses a technique from the lab syllabus (Modules 1-5).")
-    st.table([
-        {"Stage": "1. Load, display, save", "Technique": "cv2.imread / Matplotlib",
-         "Module": "M1", "CO": "CO1"},
-        {"Stage": "2. Crop + resize", "Technique": "Bounding box crop, cv2.resize",
-         "Module": "M2", "CO": "CO1"},
-        {"Stage": "3. Colour spaces", "Technique": "RGB -> Grayscale, RGB -> HSV",
-         "Module": "M2", "CO": "CO1"},
-        {"Stage": "4. Enhancement", "Technique": "CLAHE histogram equalisation (V channel)",
-         "Module": "M3", "CO": "CO2"},
-        {"Stage": "5. Noise removal", "Technique": "Median / Gaussian / Average filter",
-         "Module": "M3", "CO": "CO2"},
-        {"Stage": "6. Segmentation", "Technique": "Otsu thresholding",
-         "Module": "M4", "CO": "CO2"},
-        {"Stage": "7. Mask cleanup", "Technique": "Erosion + dilation",
-         "Module": "M2", "CO": "CO2"},
-        {"Stage": "8. Region detection", "Technique": "Contour detection",
-         "Module": "M5", "CO": "CO3"},
-        {"Stage": "9. Classification", "Technique": "MobileNetV2 transfer learning "
-         "(+ flip/rotate augmentation)", "Module": "M5 (+M2)", "CO": "CO3"},
-        {"Stage": "10. Evaluation", "Technique": "Accuracy, precision, recall, F1, "
-         "confusion matrix", "Module": "-", "CO": "CO4"},
-    ])
+    rows = [
+        ("Load, display, save", "cv2.imread / Matplotlib", "M1", "CO1"),
+        ("Crop + resize", "Bounding box crop, cv2.resize", "M2", "CO1"),
+        ("Colour spaces", "RGB -> Grayscale, RGB -> HSV", "M2", "CO1"),
+        ("Enhancement", "CLAHE histogram equalisation (V channel)", "M3", "CO2"),
+        ("Noise removal", "Median / Gaussian / Average filter", "M3", "CO2"),
+        ("Segmentation", "Otsu thresholding", "M4", "CO2"),
+        ("Mask cleanup", "Erosion + dilation", "M2", "CO2"),
+        ("Region detection", "Contour detection, convex hull", "M5", "CO3"),
+        ("Classification", "MobileNetV2 transfer learning (+ flip/rotate augmentation)",
+         "M5 (+M2)", "CO3"),
+        ("Evaluation", "Accuracy, precision, recall, F1, confusion matrix", "Project", "CO4"),
+    ]
+    st.table([{"Stage": i, "What it does": s, "Technique": t, "Module": m, "CO": c}
+              for i, (s, t, m, c) in enumerate(rows, 1)])
