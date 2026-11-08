@@ -7,7 +7,9 @@
 ![Python](https://img.shields.io/badge/Python-3.11-3776AB?logo=python&logoColor=white)
 ![OpenCV](https://img.shields.io/badge/OpenCV-5.0-5C3EE8?logo=opencv&logoColor=white)
 ![PyTorch](https://img.shields.io/badge/PyTorch-MobileNetV2-EE4C2C?logo=pytorch&logoColor=white)
-![Streamlit](https://img.shields.io/badge/Demo-Streamlit-FF4B4B?logo=streamlit&logoColor=white)
+![ONNX](https://img.shields.io/badge/ONNX_Runtime-inference-005CED?logo=onnx&logoColor=white)
+![FastAPI](https://img.shields.io/badge/API-FastAPI-009688?logo=fastapi&logoColor=white)
+![React](https://img.shields.io/badge/Web-React_19-61DAFB?logo=react&logoColor=black)
 ![Status](https://img.shields.io/badge/status-prototype%20v0.1-orange)
 
 **Project-based learning · Fundamental of Image Processing and Computer Vision Lab (26B16CS316) · 2026-27**
@@ -93,17 +95,30 @@ Plain histogram equalisation stretched each cell's darkest pixels to almost blac
 
 ---
 
-## 🖥️ Live demo
+## 🖥️ Web app
 
-```bash
-streamlit run app.py
+A React web app shows the whole pipeline live, in three tabs:
+
+- **🔍 Live diagnosis**: pick one of 12 test-set cells (or drag in your own image) and see all 10 stages, the stained-spot outline, the brightness histograms, the thresholds Otsu chose and the CNN's verdict. Switch the noise filter (Median / Gaussian / Average) and kernel sizes to see how each stage reacts.
+- **📊 Model performance**: accuracy, precision, recall and F1 compared with our first run, the confusion matrix and the training curves.
+- **🗺️ Syllabus map**: every stage mapped to its module and course outcome.
+
+### Architecture
+
+```mermaid
+flowchart LR
+    U(["👩‍🔬 Browser"]) --> W["React app<br/>(Vercel)"]
+    W -- "image + settings" --> A["FastAPI server<br/>(Render)"]
+    A --> P["pipeline.py<br/>Stages 1-8 · OpenCV"]
+    A --> M["MobileNetV2<br/>Stage 9 · ONNX Runtime"]
+    A -- "10 step images + verdict" --> W
 ```
 
-The demo opens in the browser with three tabs:
+All image processing runs in **Python with OpenCV** on the server (`pipeline.py`, the same code used for training). React only displays the results. The trained PyTorch model is exported to **ONNX** (`export_onnx.py`), so the free server can run it without loading the whole of PyTorch. The export is checked against PyTorch on every sample: the largest difference is 0.0000002.
 
-- **🔍 Live diagnosis**: pick one of 12 test-set cells (or upload your own) and see all 10 stages, the stained-spot outline and the CNN's verdict with its confidence. The sidebar lets you switch the noise filter (Median / Gaussian / Average) and kernel sizes to see how each stage reacts.
-- **📊 Model performance**: accuracy, precision, recall, F1, confusion matrix and training curves.
-- **🗺️ Syllabus map**: every stage mapped to its module and course outcome.
+> The free Render server sleeps after 15 minutes without visitors, so the first visit can take up to a minute while it wakes up. Open the site a minute before a demo.
+
+A Streamlit version of the demo (`app.py`) is kept as a one-command backup that needs no Node.js.
 
 ---
 
@@ -123,11 +138,19 @@ python -m venv .venv
 pip install -r requirements.txt
 ```
 
-**2. Try the demo right away.** The trained model and 12 sample cells are already in the repo.
+**2. Run the web app.** The trained model and 12 sample cells are already in the repo. Start the API in one terminal:
 
 ```bash
-streamlit run app.py
+uvicorn backend.main:app --reload --port 8000
 ```
+
+Then the React app in a second terminal (needs Node.js 20.19+), and open http://localhost:5173:
+
+```bash
+cd frontend && npm install && npm run dev
+```
+
+Quick alternative with Python only: `streamlit run app.py`.
 
 **3. (Optional) Download the dataset to re-train** (337 MB, official NIH source)
 
@@ -149,7 +172,23 @@ unzip -q data/cell_images.zip -d data
 python train.py                  # prototype: 3,000 images per class (~12 min on a laptop CPU)
 python train.py --per-class 0    # full dataset: all 27,558 images
 python make_figures.py           # dataset overview + per-stage pipeline figures
+python export_onnx.py            # refresh the ONNX model used by the web server
+python -m pytest tests -q        # API checks
 ```
+
+---
+
+## ☁️ Deployment
+
+| Part | Host | Config |
+|------|------|--------|
+| API (`backend/`) | [Render](https://render.com) free web service | [`render.yaml`](render.yaml) |
+| Web app (`frontend/`) | [Vercel](https://vercel.com) | Vite preset, root directory `frontend` |
+
+1. **Render**: *New → Blueprint →* pick this repository *→ Apply*. Render reads `render.yaml`, installs `backend/requirements.txt` (no PyTorch) and starts the API. Check `https://<your-service>.onrender.com/api/health`.
+2. **Vercel**: *Add New → Project →* import this repository, set **Root Directory** to `frontend`, keep the Vite preset and deploy. If your Render URL is not `https://malariavision-api.onrender.com`, add an environment variable `VITE_API_URL` with your Render URL before deploying.
+
+Both redeploy automatically on every push to `main`.
 
 ---
 
@@ -159,13 +198,18 @@ python make_figures.py           # dataset overview + per-stage pipeline figures
 ├── pipeline.py          Stages 1-8  classical image processing (each function tagged with its module)
 ├── classifier.py        Stage 9     MobileNetV2 transfer learning + flip/rotate augmentation
 ├── train.py             Stages 9-10 two-phase training and test-set evaluation
+├── export_onnx.py       exports the trained model to ONNX and checks it matches PyTorch
 ├── make_figures.py      figures for the report and viva
-├── app.py               Streamlit demo for the faculty review
+├── backend/             FastAPI server: runs pipeline.py + the ONNX model for the web app
+├── frontend/            React (Vite) web app
+├── app.py               Streamlit version of the demo (backup)
+├── tests/               API checks (pytest)
 ├── FACULTY_GUIDE.md     5-minute talk track, demo script and viva Q&A
-├── models/              trained weights (~9 MB)
+├── models/              trained weights: PyTorch (.pt) and ONNX (.onnx), ~9 MB each
 ├── samples/             12 test-set cells used by the demo
 ├── outputs/             metrics.json, confusion matrix, curves, pipeline figures, training log
-└── requirements.txt
+├── render.yaml          Render deployment for the API
+└── requirements.txt     everything for local training and development
 ```
 
 ---

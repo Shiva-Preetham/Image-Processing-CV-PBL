@@ -1,0 +1,17 @@
+# Render Blueprint for the MalariaVision API (FastAPI + ONNX Runtime).
+# Render dashboard -> New -> Blueprint -> pick this repository -> Apply.
+services:
+  - type: web
+    name: malariavision-api
+    runtime: python
+    plan: free
+    region: singapore
+    buildCommand: pip install -r backend/requirements.txt
+    startCommand: uvicorn backend.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: ALLOWED_ORIGINS
+        value: "*"
