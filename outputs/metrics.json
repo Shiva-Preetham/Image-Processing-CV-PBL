@@ -1,8 +1,8 @@
 {
-  "accuracy": 0.9266666666666666,
-  "precision": 0.9549763033175356,
-  "recall": 0.8955555555555555,
-  "f1": 0.9243119266055045,
+  "accuracy": 0.9633333333333334,
+  "precision": 0.9749430523917996,
+  "recall": 0.9511111111111111,
+  "f1": 0.9628796400449944,
   "confusion_matrix": {
     "labels": [
       "Uninfected",
@@ -10,18 +10,18 @@
     ],
     "matrix": [
       [
-        431,
-        19
+        439,
+        11
       ],
       [
-        47,
-        403
+        22,
+        428
       ]
     ],
-    "TN": 431,
-    "FP": 19,
-    "FN": 47,
-    "TP": 403
+    "TN": 439,
+    "FP": 11,
+    "FN": 22,
+    "TP": 428
   },
   "dataset": {
     "train": 4200,
@@ -29,53 +29,67 @@
     "test": 900,
     "per_class": 3000
   },
-  "best_val_acc": 0.9366666666666666,
-  "train_minutes": 7.0,
+  "best_val_acc": 0.96,
+  "train_minutes": 12.2,
   "device": "cpu",
   "settings": {
     "data": "C:\\Users\\shiva\\Desktop\\IPCV Project\\data\\cell_images",
     "per_class": "3000",
     "epochs_head": "2",
-    "epochs_finetune": "3",
-    "finetune_blocks": "5",
+    "epochs_finetune": "5",
+    "finetune_blocks": "8",
     "batch_size": "64",
     "seed": "42"
   },
   "history": [
     {
       "phase": "Phase A (frozen backbone)",
-      "train_loss": 0.36666170977410817,
-      "train_acc": 0.8316666666666667,
-      "val_loss": 0.3498673380745782,
-      "val_acc": 0.84
+      "train_loss": 0.33377976059913633,
+      "train_acc": 0.8480952380952381,
+      "val_loss": 0.26284873339864945,
+      "val_acc": 0.9011111111111111
     },
     {
       "phase": "Phase A (frozen backbone)",
-      "train_loss": 0.30806451371737886,
-      "train_acc": 0.8583333333333333,
-      "val_loss": 0.27471680468983123,
-      "val_acc": 0.8911111111111111
+      "train_loss": 0.23975583573182424,
+      "train_acc": 0.9069047619047619,
+      "val_loss": 0.2263752525382572,
+      "val_acc": 0.9177777777777778
     },
     {
-      "phase": "Phase B (fine-tune last 5 blocks)",
-      "train_loss": 0.2834437609570367,
-      "train_acc": 0.8854761904761905,
-      "val_loss": 0.19522755887773302,
-      "val_acc": 0.9244444444444444
+      "phase": "Phase B (fine-tune last 8 blocks)",
+      "train_loss": 0.17795950013966788,
+      "train_acc": 0.9366666666666666,
+      "val_loss": 0.13753901640574137,
+      "val_acc": 0.9566666666666667
     },
     {
-      "phase": "Phase B (fine-tune last 5 blocks)",
-      "train_loss": 0.1985742997271674,
-      "train_acc": 0.9226190476190477,
-      "val_loss": 0.17777435806062486,
-      "val_acc": 0.9344444444444444
+      "phase": "Phase B (fine-tune last 8 blocks)",
+      "train_loss": 0.11508822489352453,
+      "train_acc": 0.9619047619047619,
+      "val_loss": 0.12795172452926637,
+      "val_acc": 0.9466666666666667
     },
     {
-      "phase": "Phase B (fine-tune last 5 blocks)",
-      "train_loss": 0.17368844983123596,
-      "train_acc": 0.9314285714285714,
-      "val_loss": 0.1737244955698649,
-      "val_acc": 0.9366666666666666
+      "phase": "Phase B (fine-tune last 8 blocks)",
+      "train_loss": 0.10346494656233561,
+      "train_acc": 0.9652380952380952,
+      "val_loss": 0.11558527204725477,
+      "val_acc": 0.9588888888888889
+    },
+    {
+      "phase": "Phase B (fine-tune last 8 blocks)",
+      "train_loss": 0.09747803540456863,
+      "train_acc": 0.9652380952380952,
+      "val_loss": 0.11846871667438083,
+      "val_acc": 0.9588888888888889
+    },
+    {
+      "phase": "Phase B (fine-tune last 8 blocks)",
+      "train_loss": 0.0773020644060203,
+      "train_acc": 0.9730952380952381,
+      "val_loss": 0.11619799375534058,
+      "val_acc": 0.96
     }
   ]
 }

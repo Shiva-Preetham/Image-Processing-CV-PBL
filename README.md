@@ -66,17 +66,30 @@ flowchart LR
 
 ## 📊 Results (prototype v0.1)
 
-**Baseline run** (balanced subset of 6,000 images, 7 minutes on a laptop CPU), tested on **900 images the model never saw**:
+Tested on **900 cell images the model never saw** during training (balanced subset of 6,000 images, 12 minutes on a laptop CPU):
+
+<div align="center">
 
 | Accuracy | Precision | Recall | F1-score | Missed infections |
 |:--------:|:---------:|:------:|:--------:|:-----------------:|
-| **92.7%** | **95.5%** | **89.6%** | **92.4%** | 47 of 450 |
+| **96.3%** | **97.5%** | **95.1%** | **96.3%** | 22 of 450 |
 
-<img src="outputs/confusion_matrix.png" alt="Confusion matrix" width="38%"> <img src="outputs/training_curves.png" alt="Training curves" width="60%">
+<img src="outputs/confusion_matrix.png" alt="Confusion matrix" width="36%"> <img src="outputs/training_curves.png" alt="Training curves" width="62%">
 
-The baseline showed that plain histogram equalisation over-darkens cells and that the model was still improving, so v0.1 switches to CLAHE and fine-tunes longer. Updated numbers follow when that run finishes.
+</div>
+
+**What changed since the first run.** We kept our first attempt as a baseline and improved it step by step:
+
+| Version | Stage 4 enhancement | Fine-tuning | Accuracy | Recall | Missed infections |
+|---------|---------------------|-------------|:--------:|:------:|:-----------------:|
+| Baseline | Plain `equalizeHist` | 3 epochs, last 5 blocks | 92.7% | 89.6% | 47 |
+| **v0.1** | **CLAHE** | **5 epochs, last 8 blocks** | **96.3%** | **95.1%** | **22** |
+
+Plain histogram equalisation stretched each cell's darkest pixels to almost black, which hurt both Otsu and the CNN. CLAHE (still Module 3) limits the contrast boost and fixed it.
 
 **Stain-spot highlighting (Stages 6-8)**, measured on 800 random cells: a spot is outlined in **87%** of infected cells and wrongly outlined in only **3%** of healthy ones.
+
+<img src="outputs/sample_predictions.png" alt="Sample test predictions" width="100%">
 
 ---
 
@@ -133,7 +146,7 @@ unzip -q data/cell_images.zip -d data
 **4. Train, evaluate and regenerate the figures**
 
 ```bash
-python train.py                  # prototype: 3,000 images per class (~10 min on a laptop CPU)
+python train.py                  # prototype: 3,000 images per class (~12 min on a laptop CPU)
 python train.py --per-class 0    # full dataset: all 27,558 images
 python make_figures.py           # dataset overview + per-stage pipeline figures
 ```

@@ -38,9 +38,15 @@ Read it once, then present from the live demo (`streamlit run app.py`).
 | 9 | Transfer learning | "MobileNetV2 already learned edges and textures from 1.2 million photos. We keep that knowledge and retrain only the last layers to answer one question: infected or not. We also flip and rotate the training images (Module 2), because a cell looks the same upside-down." | M5 |
 | 10 | Evaluation | "We test on images the model never saw and report accuracy, precision, recall, F1 and a confusion matrix." | CO4 |
 
-## 5. Results
+## 5. Results (what to say)
 
-_Filled in after training: see section below._
+> "We tested on 900 cell images the model never saw during training. It got **96.3% accuracy**. Most importantly, its **recall is 95.1%**: out of 450 infected cells it caught 428 and missed 22. When it says 'infected', it is right **97.5%** of the time (precision)."
+
+> "Our first attempt scored 92.7% and missed 47 infected cells. Two changes fixed it: CLAHE instead of plain histogram equalisation, and fine-tuning a bit longer. That cut the missed infections by more than half."
+
+> "The stained-spot outline from Stages 6 to 8 marks the parasite in 87% of infected cells and wrongly marks only 3% of healthy cells."
+
+Show `outputs/confusion_matrix.png` and `outputs/training_curves.png` (or the **Model performance** tab in the demo).
 
 ## 6. Live demo script (2 minutes)
 

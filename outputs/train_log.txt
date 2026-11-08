@@ -1,19 +1,21 @@
 Device: cpu | images: 6000 -> train 4200, val 900, test 900
 
 Phase A (frozen backbone): 2 epoch(s), lr=0.001, trainable parameters=2,562
-  epoch 1/2  train loss 0.367 acc 0.832 | val loss 0.350 acc 0.840  (84s)
-  epoch 2/2  train loss 0.308 acc 0.858 | val loss 0.275 acc 0.891  (84s)
+  epoch 1/2  train loss 0.334 acc 0.848 | val loss 0.263 acc 0.901  (109s)
+  epoch 2/2  train loss 0.240 acc 0.907 | val loss 0.226 acc 0.918  (76s)
 
-Phase B (fine-tune last 5 blocks): 3 epoch(s), lr=0.0001, trainable parameters=1,683,906
-  epoch 1/3  train loss 0.283 acc 0.885 | val loss 0.195 acc 0.924  (82s)
-  epoch 2/3  train loss 0.199 acc 0.923 | val loss 0.178 acc 0.934  (74s)
-  epoch 3/3  train loss 0.174 acc 0.931 | val loss 0.174 acc 0.937  (94s)
+Phase B (fine-tune last 8 blocks): 5 epoch(s), lr=0.0001, trainable parameters=1,987,074
+  epoch 1/5  train loss 0.178 acc 0.937 | val loss 0.138 acc 0.957  (103s)
+  epoch 2/5  train loss 0.115 acc 0.962 | val loss 0.128 acc 0.947  (113s)
+  epoch 3/5  train loss 0.103 acc 0.965 | val loss 0.116 acc 0.959  (111s)
+  epoch 4/5  train loss 0.097 acc 0.965 | val loss 0.118 acc 0.959  (108s)
+  epoch 5/5  train loss 0.077 acc 0.973 | val loss 0.116 acc 0.960  (113s)
 
 Test set (900 images, never seen in training):
-  accuracy  0.9267
-  precision 0.9550
-  recall    0.8956
-  f1        0.9243
-  confusion matrix [[TN FP] [FN TP]] = [[431, 19], [47, 403]]
-  missed infections (false negatives): 47
-Training time: 7.0 min. Model saved to C:\Users\shiva\Desktop\IPCV Project\models\malariavision_mobilenetv2.pt
+  accuracy  0.9633
+  precision 0.9749
+  recall    0.9511
+  f1        0.9629
+  confusion matrix [[TN FP] [FN TP]] = [[439, 11], [22, 428]]
+  missed infections (false negatives): 22
+Training time: 12.2 min. Model saved to C:\Users\shiva\Desktop\IPCV Project\models\malariavision_mobilenetv2.pt
