@@ -10,9 +10,11 @@
 ![ONNX](https://img.shields.io/badge/ONNX_Runtime-inference-005CED?logo=onnx&logoColor=white)
 ![FastAPI](https://img.shields.io/badge/API-FastAPI-009688?logo=fastapi&logoColor=white)
 ![React](https://img.shields.io/badge/Web-React_19-61DAFB?logo=react&logoColor=black)
-![Status](https://img.shields.io/badge/status-prototype%20v0.1-orange)
+![Status](https://img.shields.io/badge/release-v1.0-2b8a3e)
+![Accuracy](https://img.shields.io/badge/test_accuracy-96.6%25-6d3fc0)
 
 [![Live demo](https://img.shields.io/badge/🌐_Live_demo-malariavision.vercel.app-6d3fc0?style=for-the-badge&logo=vercel&logoColor=white)](https://malariavision.vercel.app)
+[![Project report](https://img.shields.io/badge/📄_Project_report-PDF-c92a2a?style=for-the-badge)](report/MalariaVision_Project_Report.pdf)
 
 **Project-based learning · Fundamental of Image Processing and Computer Vision Lab (26B16CS316) · 2026-27**
 
@@ -68,30 +70,31 @@ flowchart LR
 
 ---
 
-## 📊 Results (prototype v0.1)
+## 📊 Results (v1.0)
 
-Tested on **900 cell images the model never saw** during training (balanced subset of 6,000 images, 12 minutes on a laptop CPU):
+Trained on the **full dataset** (27,558 images, 37 minutes on a laptop CPU) and tested on **4,144 cell images the model never saw**:
 
 <div align="center">
 
-| Accuracy | Precision | Recall | F1-score | Missed infections |
-|:--------:|:---------:|:------:|:--------:|:-----------------:|
-| **96.3%** | **97.5%** | **95.1%** | **96.3%** | 22 of 450 |
+| Accuracy | Precision | Recall | F1-score | Specificity | Missed infections |
+|:--------:|:---------:|:------:|:--------:|:-----------:|:-----------------:|
+| **96.6%** | **96.9%** | **96.3%** | **96.6%** | **96.9%** | 76 of 2,072 |
 
 <img src="outputs/confusion_matrix.png" alt="Confusion matrix" width="36%"> <img src="outputs/training_curves.png" alt="Training curves" width="62%">
 
 </div>
 
-**What changed since the first run.** We kept our first attempt as a baseline and improved it step by step:
+**What changed along the way.** We kept every earlier attempt and measured each change:
 
-| Version | Stage 4 enhancement | Fine-tuning | Accuracy | Recall | Missed infections |
-|---------|---------------------|-------------|:--------:|:------:|:-----------------:|
-| Baseline | Plain `equalizeHist` | 3 epochs, last 5 blocks | 92.7% | 89.6% | 47 |
-| **v0.1** | **CLAHE** | **5 epochs, last 8 blocks** | **96.3%** | **95.1%** | **22** |
+| Version | Training data | Stage 4 enhancement | Fine-tuning | Accuracy | Recall | Missed infections |
+|---------|---------------|---------------------|-------------|:--------:|:------:|:-----------------:|
+| Baseline | 6,000-image subset | Plain `equalizeHist` | 3 epochs, last 5 blocks | 92.7% | 89.6% | 47 of 450 (10.4%) |
+| v0.1 | 6,000-image subset | CLAHE | 5 epochs, last 8 blocks | 96.3% | 95.1% | 22 of 450 (4.9%) |
+| **v1.0** | **all 27,558 images** | **CLAHE** | **5 epochs, last 8 blocks** | **96.6%** | **96.3%** | **76 of 2,072 (3.7%)** |
 
-Plain histogram equalisation stretched each cell's darkest pixels to almost black, which hurt both Otsu and the CNN. CLAHE (still Module 3) limits the contrast boost and fixed it.
+Plain histogram equalisation stretched each cell's darkest pixels to almost black, which hurt both Otsu and the CNN. CLAHE (still Module 3) limits the contrast boost and fixed it. Training on the full dataset then raised recall again and gives scores measured on a test set more than four times larger.
 
-**Stain-spot highlighting (Stages 6-8)**, measured on 800 random cells: a spot is outlined in **87%** of infected cells and wrongly outlined in only **3%** of healthy ones.
+**Stain-spot highlighting (Stages 6-8)**, measured on the same 4,144 test images (`evaluate_segmentation.py`): the cell outline is found in **100%** of cells, a stained spot is outlined in **86.3%** of infected cells, and only **3.0%** of healthy cells get a false spot.
 
 <img src="outputs/sample_predictions.png" alt="Sample test predictions" width="100%">
 
@@ -118,7 +121,7 @@ flowchart LR
     A -- "10 step images + verdict" --> W
 ```
 
-All image processing runs in **Python with OpenCV** on the server (`pipeline.py`, the same code used for training). React only displays the results. The trained PyTorch model is exported to **ONNX** (`export_onnx.py`), so the free server can run it without loading the whole of PyTorch. The export is checked against PyTorch on every sample: the largest difference is 0.0000002.
+All image processing runs in **Python with OpenCV** on the server (`pipeline.py`, the same code used for training). React only displays the results. The trained PyTorch model is exported to **ONNX** (`export_onnx.py`), so the free server can run it without loading the whole of PyTorch. The export is checked against PyTorch on every sample: the largest difference is 0.0000011.
 
 > The free Render server sleeps after 15 minutes without visitors, so the first visit can take up to a minute while it wakes up. Open the site a minute before a demo.
 
@@ -173,12 +176,27 @@ unzip -q data/cell_images.zip -d data
 **4. Train, evaluate and regenerate the figures**
 
 ```bash
-python train.py                  # prototype: 3,000 images per class (~12 min on a laptop CPU)
-python train.py --per-class 0    # full dataset: all 27,558 images
-python make_figures.py           # dataset overview + per-stage pipeline figures
-python export_onnx.py            # refresh the ONNX model used by the web server
-python -m pytest tests -q        # API checks
+python train.py                     # full dataset, all 27,558 images (~40 min on a laptop CPU)
+python train.py --per-class 3000    # quick run on a 6,000-image subset (~12 min)
+python evaluate_segmentation.py     # Stages 6-8 measured on the test set
+python export_onnx.py               # refresh the ONNX model used by the web server
+python make_figures.py              # dataset overview + per-stage pipeline figures
+python -m pytest tests -q           # API checks
 ```
+
+**5. Rebuild the project report** (needs Node.js and LibreOffice)
+
+```bash
+cd report && npm install && cd ..
+python report/take_screenshots.py   # web-app screenshots (uses Microsoft Edge)
+python report/build.py              # report/MalariaVision_Project_Report.docx + .pdf
+```
+
+---
+
+## 📄 Project report
+
+The full report, in the department's format, is in [`report/MalariaVision_Project_Report.pdf`](report/MalariaVision_Project_Report.pdf) (editable Word version: [`.docx`](report/MalariaVision_Project_Report.docx)). Its 17 chapters cover the system, the dataset, every image-processing stage with its formulas, transfer learning, results and error analysis, output screens, testing, and the syllabus and course-outcome mapping. It is generated from the real results by `report/build.py`, so every number in it matches `outputs/`.
 
 ---
 
@@ -202,8 +220,10 @@ Both redeploy automatically on every push to `main`.
 ├── pipeline.py          Stages 1-8  classical image processing (each function tagged with its module)
 ├── classifier.py        Stage 9     MobileNetV2 transfer learning + flip/rotate augmentation
 ├── train.py             Stages 9-10 two-phase training and test-set evaluation
+├── evaluate_segmentation.py  Stages 6-8 measured on the test set
 ├── export_onnx.py       exports the trained model to ONNX and checks it matches PyTorch
 ├── make_figures.py      figures for the report and viva
+├── report/              project report (PDF + Word) and the scripts that build it
 ├── backend/             FastAPI server: runs pipeline.py + the ONNX model for the web app
 ├── frontend/            React (Vite) web app
 ├── app.py               Streamlit version of the demo (backup)
@@ -224,7 +244,7 @@ Both redeploy automatically on every push to `main`.
 
 <img src="outputs/dataset_overview.png" alt="Sample cells from both classes" width="100%">
 
-Split used: 70% train, 15% validation, 15% test (stratified, seed 42). Test images are never used during training.
+Split used: 70% train (19,282), 15% validation (4,132), 15% test (4,144), stratified with seed 42. Test images are never used during training, and the 12 demo cells are always kept in the test set.
 
 ---
 
@@ -242,9 +262,9 @@ Split used: 70% train, 15% validation, 15% test (stratified, seed 42). Test imag
 ## 🛣️ Roadmap
 
 - [x] **v0.1 prototype**: full 10-stage pipeline, trained model, demo app, report figures
-- [ ] Faculty review and feedback
-- [ ] **v0.2**: improvements from the feedback (candidates: train on the full dataset, adaptive thresholding for unevenly stained cells, a Jupyter notebook version for submission)
-- [ ] Final report and viva
+- [x] React web app + FastAPI server, deployed on Vercel and Render
+- [x] **v1.0**: trained on the full dataset, Stages 6-8 measured on the test set, project report
+- [ ] Future work: adaptive thresholding for unevenly stained cells (Module 4), whole-smear cell detection (Module 5), U-Net / SAM segmentation (Module 6)
 
 ---
 

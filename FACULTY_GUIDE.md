@@ -1,6 +1,6 @@
 # Presenting MalariaVision to the Lab Faculty
 
-A 5-minute talk track for the prototype review, written in plain words.
+A 5-minute talk track for the final review (v1.0), written in plain words. The full written report is `report/MalariaVision_Project_Report.pdf`.
 Read it once, then present from the web app: **https://malariavision.vercel.app**
 
 **Before the review:** open the web app about a minute early. The free server sleeps when nobody uses it, and the first visit wakes it up. If there is no internet, run it locally (README, "Quick start") or use the one-command backup: `streamlit run app.py`.
@@ -42,20 +42,20 @@ Read it once, then present from the web app: **https://malariavision.vercel.app*
 
 ## 5. Results (what to say)
 
-> "We tested on 900 cell images the model never saw during training. It got **96.3% accuracy**. Most importantly, its **recall is 95.1%**: out of 450 infected cells it caught 428 and missed 22. When it says 'infected', it is right **97.5%** of the time (precision)."
+> "We trained on all 27,558 images and tested on 4,144 cell images the model never saw during training. It got **96.6% accuracy**. Most importantly, its **recall is 96.3%**: out of 2,072 infected cells it caught 1,996 and missed 76. When it says 'infected', it is right **96.9%** of the time (precision)."
 
-> "Our first attempt scored 92.7% and missed 47 infected cells. Two changes fixed it: CLAHE instead of plain histogram equalisation, and fine-tuning a bit longer. That cut the missed infections by more than half."
+> "Our first attempt, on a small subset, scored 92.7% and missed about 1 infected cell in 10. Two changes fixed most of that: CLAHE instead of plain histogram equalisation, and fine-tuning a bit longer. Training on the full dataset then brought the miss rate down to 3.7%."
 
-> "The stained-spot outline from Stages 6 to 8 marks the parasite in 87% of infected cells and wrongly marks only 3% of healthy cells."
+> "The stained-spot outline from Stages 6 to 8, measured on the same 4,144 test images, marks the parasite in 86% of infected cells and wrongly marks only 3% of healthy cells."
 
 Show `outputs/confusion_matrix.png` and `outputs/training_curves.png` (or the **Model performance** tab in the demo).
 
 ## 6. Live demo script (2 minutes)
 
 1. The **Live diagnosis** tab opens on **Parasitized #2**.
-   Point at the red outlines: "Stages 6 to 8 found two stained spots." Then point at the verdict card: "The CNN agrees: Parasitized, 99.4% confident."
+   Point at the red outlines: "Stages 6 to 8 found two stained spots." Then point at the verdict card: "The CNN agrees: Parasitized, 98.6% confident."
 2. Switch to **Uninfected #1**: no red spot, and a green verdict.
-3. Be honest about a miss: switch to **Parasitized #1**. "This cell is labelled infected, but its stain is faint and spread out, with no dark dot. Both our spot detector and the CNN call it healthy. It is one of the 22 infected cells we miss, and it is why we report recall, not just accuracy." (The other 11 sample cells are all classified correctly.)
+3. Be honest about a miss: switch to **Parasitized #1**. "This cell is labelled infected, but its stain is faint and spread out, with no dark dot. Both our spot detector and the CNN call it healthy. It is one of the 76 infected test cells we miss, and it is why we report recall, not just accuracy." (The other 11 sample cells are all classified correctly.)
 4. Go back to **Parasitized #2** and scroll through the 10 step images: "Each picture is one syllabus topic, labelled with its module."
 5. Under **Tune the pipeline**, change the filter from **Median** to **Gaussian** and raise the kernel size to 7. The images get blurrier and the spot outline changes. "This is why we chose a small median filter."
 6. Open **Model performance**: read out recall and the number of missed infections.
@@ -70,7 +70,7 @@ Show `outputs/confusion_matrix.png` and `outputs/training_curves.png` (or the **
 - **Why transfer learning and not a CNN from scratch?** A CNN trained from scratch needs far more images and time. A pre-trained network already knows basic shapes and textures, so it learns our task quickly and accurately on a laptop.
 - **Why not just accuracy?** In diagnosis, missing an infected cell (false negative) is worse than a false alarm, so recall and the confusion matrix matter more than accuracy alone.
 - **What is the role of Stages 6-8 if the CNN decides?** They make the system explainable: the red contour shows where the suspicious spot is, so a human can check the CNN's answer.
-- **How did you tune Stages 6-8?** We measured them on 800 random cells. The first version highlighted a spot in only 64% of infected cells, because the dark parasite was cut out of the cell outline. After the convex-hull fix it is 89%, while only 4% of healthy cells get a false highlight.
+- **How did you tune Stages 6-8?** We measured them on 800 random cells. The first version highlighted a spot in only 64% of infected cells, because the dark parasite was cut out of the cell outline. After the convex-hull fix it is 89%, while only 4% of healthy cells get a false highlight. On the final test set of 4,144 images it is 86.3% and 3.0%.
 - **Limitations?** The dataset has one cell per image. A full slide would first need the cells to be separated (more segmentation). When the whole cell is unevenly stained, a single Otsu threshold splits the cell's rim from its centre and misses the parasite; adaptive thresholding (also Module 4) is our planned fix. A few dataset images labelled "Parasitized" show no visible parasite, so some label noise exists. Different stains or microscopes may need re-training.
 
 ## 8. What we want feedback on
@@ -78,7 +78,7 @@ Show `outputs/confusion_matrix.png` and `outputs/training_curves.png` (or the **
 Ask the faculty these questions, so the next version follows their guidance:
 
 1. Is the 10-stage pipeline the right depth, or should one stage be shown in more detail (for example, comparing Average vs. Gaussian vs. Median with numbers)?
-2. Should we train on the full 27,558 images for the final version (the prototype uses a subset to train quickly on a laptop)?
+2. Is training on the full 27,558 images and testing on 4,144 unseen images enough evidence, or should we also compare another network such as ResNet18?
 3. Do you prefer a Jupyter notebook submission alongside the demo app?
 4. Should the stained-spot detection from Stages 6-8 also be measured on the test set?
 5. For unevenly stained cells, should we add adaptive thresholding next to Otsu (both are Module 4)?

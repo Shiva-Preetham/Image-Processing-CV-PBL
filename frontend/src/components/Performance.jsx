@@ -2,8 +2,9 @@ import { useEffect, useState } from "react";
 import { api, pct } from "../api";
 import LineChart from "./LineChart";
 
-// First training run, kept for comparison (see README "What changed since the first run").
-const BASELINE = { accuracy: 0.9267, precision: 0.955, recall: 0.8956, f1: 0.9243, FN: 47 };
+// Earlier runs on a 6,000-image subset, kept for comparison (see README "What changed").
+const BASELINE = { accuracy: 0.9267, precision: 0.955, recall: 0.8956, f1: 0.9243, FN: 47, infected: 450 };
+const V01 = { accuracy: 0.9633, recall: 0.9511, FN: 22, infected: 450 };
 
 const METRICS = [
   { key: "accuracy", name: "Accuracy", explain: "Correct answers out of all test cells." },
@@ -110,19 +111,25 @@ export default function Performance() {
         <div className="table-wrap">
           <table>
             <thead>
-              <tr><th>Version</th><th>Stage 4 enhancement</th><th>Fine-tuning</th><th>Accuracy</th><th>Recall</th><th>Missed infections</th></tr>
+              <tr><th>Version</th><th>Training data</th><th>Stage 4 enhancement</th><th>Accuracy</th><th>Recall</th><th>Missed infections</th></tr>
             </thead>
             <tbody>
-              <tr><td>Baseline</td><td>Plain histogram equalisation</td><td>3 epochs, last 5 blocks</td>
-                <td>{pct(BASELINE.accuracy)}</td><td>{pct(BASELINE.recall)}</td><td>{BASELINE.FN}</td></tr>
-              <tr className="highlight"><td>v0.1</td><td>CLAHE</td><td>5 epochs, last 8 blocks</td>
-                <td>{pct(m.accuracy)}</td><td>{pct(m.recall)}</td><td>{cm.FN}</td></tr>
+              <tr><td>Baseline</td><td>6,000-image subset</td><td>Plain histogram equalisation</td>
+                <td>{pct(BASELINE.accuracy)}</td><td>{pct(BASELINE.recall)}</td>
+                <td>{BASELINE.FN} of {BASELINE.infected} ({pct(BASELINE.FN / BASELINE.infected)})</td></tr>
+              <tr><td>v0.1</td><td>6,000-image subset</td><td>CLAHE, longer fine-tuning</td>
+                <td>{pct(V01.accuracy)}</td><td>{pct(V01.recall)}</td>
+                <td>{V01.FN} of {V01.infected} ({pct(V01.FN / V01.infected)})</td></tr>
+              <tr className="highlight"><td>v1.0 (final)</td><td>All {(m.dataset.train + m.dataset.val + m.dataset.test).toLocaleString()} images</td>
+                <td>CLAHE, longer fine-tuning</td><td>{pct(m.accuracy)}</td><td>{pct(m.recall)}</td>
+                <td>{cm.FN} of {(cm.FN + cm.TP).toLocaleString()} ({pct(cm.FN / (cm.FN + cm.TP))})</td></tr>
             </tbody>
           </table>
         </div>
         <p className="muted small">
-          Plain equalisation stretched each cell's darkest pixels to almost black, which hurt both Otsu and the CNN.
-          CLAHE (still Module 3) limits the contrast boost.
+          Plain equalisation stretched each cell's darkest pixels to almost black, which hurt both Otsu and the CNN;
+          CLAHE (still Module 3) limits the contrast boost. The final model was trained on the full dataset and
+          tested on {m.dataset.test.toLocaleString()} unseen images, so its scores are the most reliable.
         </p>
       </div>
 
