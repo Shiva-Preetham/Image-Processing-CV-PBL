@@ -1,0 +1,22 @@
+{
+  "test_images": 4144,
+  "cell_outline_found_rate": 1.0,
+  "parasitized": {
+    "cells": 2072,
+    "with_spot": 1789,
+    "with_spot_rate": 0.8634169884169884,
+    "mean_spots_when_found": 1.5505869200670765,
+    "median_stain_contrast": 76.49234771728516
+  },
+  "uninfected": {
+    "cells": 2072,
+    "with_spot": 63,
+    "with_spot_rate": 0.030405405405405407,
+    "mean_spots_when_found": 1.2698412698412698,
+    "median_stain_contrast": 1.3880653381347656
+  },
+  "spot_detection_rate_infected": 0.8634169884169884,
+  "false_spot_rate_healthy": 0.030405405405405407,
+  "min_stain_contrast": 20,
+  "seconds": 30.0
+}

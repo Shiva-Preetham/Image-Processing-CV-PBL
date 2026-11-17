@@ -9,6 +9,7 @@ so the free cloud server does not need the whole of PyTorch in memory.
 The network and its weights are exactly the same; this script checks that
 both versions give the same answers on the demo samples.
 """
+import json
 from pathlib import Path
 
 import numpy as np
@@ -44,6 +45,9 @@ def verify(model):
         print(f"{path.stem:15s} PyTorch {p_torch:.5f}   ONNX {p_onnx:.5f}")
     print(f"Largest difference in probability: {worst:.2e}")
     assert worst < 1e-4, "ONNX model does not match the PyTorch model"
+    (ROOT / "outputs" / "onnx_check.json").write_text(json.dumps(
+        {"samples_checked": len(list((ROOT / "samples").glob("*.png"))),
+         "max_probability_difference": worst}, indent=2))
 
 
 if __name__ == "__main__":

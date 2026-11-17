@@ -1,0 +1,38 @@
+{
+  "Parasitized": {
+    "images": 13779,
+    "width": {
+      "min": 46,
+      "median": 133,
+      "max": 394
+    },
+    "height": {
+      "min": 40,
+      "median": 133,
+      "max": 385
+    }
+  },
+  "Uninfected": {
+    "images": 13779,
+    "width": {
+      "min": 49,
+      "median": 130,
+      "max": 247
+    },
+    "height": {
+      "min": 49,
+      "median": 130,
+      "max": 235
+    }
+  },
+  "all": {
+    "width": {
+      "min": 46,
+      "max": 394
+    },
+    "height": {
+      "min": 40,
+      "max": 385
+    }
+  }
+}

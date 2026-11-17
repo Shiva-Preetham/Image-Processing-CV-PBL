@@ -1,11 +1,13 @@
 """
 MalariaVision - train the CNN (Stage 9) and evaluate it (Stage 10).
 
-    python train.py                  # prototype run on a balanced subset
-    python train.py --per-class 0    # use all 27,558 images
+    python train.py                     # full dataset, all 27,558 images (~1 h on a laptop CPU)
+    python train.py --per-class 3000    # quick run on a balanced subset (~12 min)
 
 Data split: 70% train / 15% validation / 15% test (test images are never
-seen during training - they are only used for the final scores).
+seen during training - they are only used for the final scores). The 12
+demo cells in samples/ are always kept in the test set, so the demo only
+ever shows cells the model has not seen.
 
 Training happens in two short phases (transfer learning):
   Phase A - pre-trained layers frozen, only the new output layer learns.
@@ -13,9 +15,11 @@ Training happens in two short phases (transfer learning):
             with a small learning rate.
 """
 import argparse
+import hashlib
 import json
 import random
 import shutil
+import sys
 import time
 from pathlib import Path
 
@@ -42,7 +46,7 @@ SAMPLES = ROOT / "samples"
 def parse_args():
     p = argparse.ArgumentParser()
     p.add_argument("--data", default=ROOT / "data" / "cell_images", type=Path)
-    p.add_argument("--per-class", default=3000, type=int, help="images per class, 0 = all")
+    p.add_argument("--per-class", default=0, type=int, help="images per class, 0 = all")
     p.add_argument("--epochs-head", default=2, type=int, help="Phase A epochs")
     p.add_argument("--epochs-finetune", default=5, type=int, help="Phase B epochs")
     p.add_argument("--finetune-blocks", default=8, type=int)
@@ -63,6 +67,27 @@ def list_dataset(data_dir, per_class, seed):
         paths += files
         labels += [label] * len(files)
     return paths, labels
+
+
+def demo_sample_indices(paths):
+    """Positions in `paths` of the dataset files that are the demo cells in
+    samples/ (matched by file content, since the copies were renamed)."""
+    md5 = lambda p: hashlib.md5(Path(p).read_bytes()).hexdigest()
+    wanted = {md5(p) for p in SAMPLES.glob("*.png")}
+    return [i for i, p in enumerate(paths) if wanted and md5(p) in wanted]
+
+
+def split_dataset(paths, labels, seed):
+    """70/15/15 stratified split, with the demo cells forced into the test set."""
+    keep = set(demo_sample_indices(paths))
+    pool = [i for i in range(len(paths)) if i not in keep]
+    tr, rest = train_test_split(pool, test_size=0.30, stratify=[labels[i] for i in pool],
+                                random_state=seed)
+    va, te = train_test_split(rest, test_size=0.50, stratify=[labels[i] for i in rest],
+                              random_state=seed)
+    te = te + sorted(keep)
+    pick = lambda idx: ([paths[i] for i in idx], [labels[i] for i in idx])
+    return pick(tr), pick(va), pick(te), len(keep)
 
 
 def set_train_mode(model):
@@ -161,8 +186,32 @@ def plot_predictions(paths, labels, probs, path, n=12, seed=0):
     plt.close(fig)
 
 
+class Tee:
+    """Print to the screen and to outputs/train_log.txt at the same time."""
+    def __init__(self, *streams):
+        self.streams = streams
+
+    def write(self, text):
+        for s in self.streams:
+            s.write(text)
+            s.flush()
+
+    def flush(self):
+        for s in self.streams:
+            s.flush()
+
+
+def save_test_split(paths, labels, path):
+    """The exact test images, so other scripts can evaluate on the same set."""
+    rows = ["label,file"] + [f"{CLASSES[y]},{Path(p).name}" for p, y in zip(paths, labels)]
+    path.write_text("\n".join(rows) + "\n")
+
+
 def copy_demo_samples(paths, labels, k=6, seed=1):
-    """Copy a few TEST images (never seen in training) for the demo app."""
+    """Copy a few TEST images (never seen in training) for the demo app.
+    Existing demo cells are kept (they are forced into the test set)."""
+    if any(SAMPLES.glob("*.png")):
+        return
     SAMPLES.mkdir(exist_ok=True)
     rng = random.Random(seed)
     for label, name in enumerate(CLASSES):
@@ -179,14 +228,13 @@ def main():
     device = "cuda" if torch.cuda.is_available() else "cpu"
     OUT.mkdir(exist_ok=True)
     MODEL_PATH.parent.mkdir(exist_ok=True)
+    sys.stdout = Tee(sys.__stdout__, open(OUT / "train_log.txt", "w", encoding="utf-8"))
 
     paths, labels = list_dataset(args.data, args.per_class, args.seed)
-    tr_p, rest_p, tr_y, rest_y = train_test_split(paths, labels, test_size=0.30,
-                                                  stratify=labels, random_state=args.seed)
-    va_p, te_p, va_y, te_y = train_test_split(rest_p, rest_y, test_size=0.50,
-                                              stratify=rest_y, random_state=args.seed)
+    (tr_p, tr_y), (va_p, va_y), (te_p, te_y), n_demo = split_dataset(paths, labels, args.seed)
+    save_test_split(te_p, te_y, OUT / "test_split.csv")
     print(f"Device: {device} | images: {len(paths)} -> train {len(tr_p)}, "
-          f"val {len(va_p)}, test {len(te_p)}")
+          f"val {len(va_p)}, test {len(te_p)} (includes the {n_demo} demo cells)")
 
     loaders = {
         "train": DataLoader(CellDataset(tr_p, tr_y, train=True), args.batch_size, shuffle=True),

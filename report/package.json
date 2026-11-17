@@ -1,0 +1,12 @@
+{
+  "name": "malariavision-report",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Builds the MalariaVision project report (Word + PDF) from the project's results.",
+  "scripts": {
+    "build": "node build_report.js"
+  },
+  "dependencies": {
+    "docx": "^9.15.4"
+  }
+}
