@@ -36,6 +36,8 @@ The parasite shows up as a **dark purple spot** inside the red blood cell (the G
 
 Every technique comes from the lab syllabus (Modules 1 to 5).
 
+> **New to the code?** Start with [`TEAM_GUIDE.md`](TEAM_GUIDE.md): what each file does, the order to read them in, and how one image flows through the pipeline.
+
 ---
 
 ## 🧭 How it works
@@ -228,6 +230,7 @@ Both redeploy automatically on every push to `main`.
 ├── frontend/            React (Vite) web app
 ├── app.py               Streamlit version of the demo (backup)
 ├── tests/               API checks (pytest)
+├── TEAM_GUIDE.md        code walkthrough for the team: reading order, data flow, viva numbers
 ├── FACULTY_GUIDE.md     5-minute talk track, demo script and viva Q&A
 ├── models/              trained weights: PyTorch (.pt) and ONNX (.onnx), ~9 MB each
 ├── samples/             12 test-set cells used by the demo
