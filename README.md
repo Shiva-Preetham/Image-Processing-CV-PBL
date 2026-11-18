@@ -72,9 +72,13 @@ flowchart LR
 
 ### Inside the CNN (Stage 9)
 
-The cleaned cell image enters the input layer, passes through MobileNetV2's 52 convolution layers (early layers frozen, later layers fine-tuned), and the output layer gives the probability of each class. On the right, one neuron is zoomed in: it multiplies its inputs by learned weights, adds a bias and applies an activation function.
+The cleaned cell image enters the input layer, passes through MobileNetV2's 52 convolution layers (early layers frozen, later layers fine-tuned), and the output layer gives the probability of each class.
 
-<img src="report/assets/neural_network.png" alt="Neural network architecture of the MalariaVision classifier, with one neuron zoomed in" width="100%">
+<img src="report/assets/neural_network.png" alt="Neural network architecture of the MalariaVision classifier" width="100%">
+
+Every node in the hidden and output layers does the same small calculation: it multiplies its inputs by learned weights, adds a bias and applies an activation function.
+
+<img src="report/assets/neuron.png" alt="One neuron in detail: weighted sum plus bias, then an activation function" width="100%">
 
 ---
 

@@ -82,34 +82,35 @@ GREEN, BLUE, RED, GREY = "#2E9E5B", "#2F6FED", "#EE4B5C", "#9A9A9A"
 
 
 def neural_network():
-    """Simplified neural-network picture of our MobileNetV2 classifier,
-    with one node zoomed in (weights, bias, activation)."""
+    """Simplified neural-network picture of our MobileNetV2 classifier
+    (report/assets/neural_network.png). Large text so it stays readable
+    at README and A4 width."""
     plt.rcParams["font.family"] = "DejaVu Sans"
-    fig, ax = plt.subplots(figsize=(16, 9))
-    ax.set_xlim(0, 16)
-    ax.set_ylim(0, 9)
+    fig, ax = plt.subplots(figsize=(12, 7.8))
+    ax.set_xlim(0, 12)
+    ax.set_ylim(0, 7.8)
     ax.axis("off")
 
-    ax.text(8, 8.6, "MalariaVision: Neural Network Architecture", ha="center", va="center",
-            fontsize=26, fontweight="bold")
-    ax.text(8, 8.1, "Simplified view of our MobileNetV2 classifier (transfer learning)", ha="center",
-            va="center", fontsize=14, color="#555")
+    ax.text(6, 7.45, "MalariaVision: Neural Network Architecture", ha="center", va="center",
+            fontsize=22, fontweight="bold")
+    ax.text(6, 7.05, "Simplified view of our MobileNetV2 classifier (transfer learning)", ha="center",
+            va="center", fontsize=13, color="#555")
 
     # Input cell image
     cell = plt.imread(Path(__file__).resolve().parent.parent / "samples" / "parasitized_2.png")
-    ax.imshow(cell, extent=(0.2, 1.7, 4.0, 5.5), zorder=3)
-    ax.text(0.95, 3.75, "Cell image", ha="center", va="top", fontsize=12, fontweight="bold")
-    ax.text(0.95, 3.4, "128 × 128 × 3", ha="center", va="top", fontsize=11, color="#444")
-    ax.annotate("", xy=(2.5, 4.75), xytext=(1.8, 4.75),
-                arrowprops=dict(arrowstyle="-|>", color="black", lw=1.5))
+    ax.imshow(cell, extent=(0.15, 1.65, 3.1, 4.6), zorder=3)
+    ax.text(0.9, 2.85, "Cell image", ha="center", va="top", fontsize=14, fontweight="bold")
+    ax.text(0.9, 2.5, "128 × 128 × 3", ha="center", va="top", fontsize=13, color="#444")
 
-    r = 0.27
-    X_IN, X_H1, X_H2, X_OUT = 2.9, 5.0, 7.1, 9.2
+    r = 0.3
+    X_IN, X_H1, X_H2, X_OUT = 2.6, 4.55, 6.85, 8.95
+    ax.annotate("", xy=(X_IN - r - 0.08, 3.85), xytext=(1.75, 3.85),
+                arrowprops=dict(arrowstyle="-|>", color="black", lw=1.6))
     layers = {
-        "in": (X_IN, [6.8, 5.8, 4.8, 2.8], GREEN, 3.8),
-        "h1": (X_H1, [6.4, 5.4, 4.4, 3.4], BLUE, 2.6),
-        "h2": (X_H2, [5.9, 4.9, 3.9], BLUE, None),
-        "out": (X_OUT, [5.55, 4.15], RED, None),
+        "in": (X_IN, [5.55, 4.65, 3.75, 2.05], GREEN, 2.9),
+        "h1": (X_H1, [5.2, 4.3, 3.4, 2.5], BLUE, None),
+        "h2": (X_H2, [4.75, 3.8, 2.85], BLUE, None),
+        "out": (X_OUT, [4.35, 3.2], RED, None),
     }
     # Connections first, so circles are drawn on top
     order = ["in", "h1", "h2", "out"]
@@ -118,75 +119,97 @@ def neural_network():
         xb, yb, _, _ = layers[b]
         for y1 in ya:
             for y2 in yb:
-                ax.plot([xa + r, xb - r], [y1, y2], color=GREY, lw=0.8, zorder=1)
+                ax.plot([xa + r, xb - r], [y1, y2], color=GREY, lw=0.9, zorder=1)
     for key, (x, ys, color, dots) in layers.items():
         for y in ys:
             ax.add_patch(plt.Circle((x, y), r, color=color, zorder=2))
         if dots:
-            ax.text(x, dots, "⋮", ha="center", va="center", fontsize=26, color="#555")
-    for i, y in enumerate([6.8, 5.8, 4.8]):
-        ax.text(X_IN, y, f"x{'₁₂₃'[i]}", ha="center", va="center", fontsize=11, color="white",
+            ax.text(x, dots, "⋮", ha="center", va="center", fontsize=28, color="#555")
+    for label, y in (("x₁", 5.55), ("x₂", 4.65), ("x₃", 3.75), ("xₙ", 2.05)):
+        ax.text(X_IN, y, label, ha="center", va="center", fontsize=14, color="white",
                 fontweight="bold", zorder=3)
-    ax.text(X_IN, 2.8, "xₙ", ha="center", va="center", fontsize=11, color="white", fontweight="bold",
-            zorder=3)
 
     # Column labels
-    ax.text(X_IN, 7.45, "Input layer", ha="center", fontsize=13, fontweight="bold", color=GREEN)
-    ax.text(X_IN, 2.15, "49,152 pixel values\n(after Stages 1-5)", ha="center", va="top", fontsize=10.5)
     mid = (X_H1 + X_H2) / 2
-    ax.text(mid, 7.45, "Hidden layers", ha="center", fontsize=13, fontweight="bold", color=BLUE)
-    ax.text(mid, 7.2, "52 convolution layers\n(17 inverted residual blocks)", ha="center", va="top",
-            fontsize=10, color="#333")
-    ax.text(X_H1, 2.15, "Early layers\nedges, colours\n(frozen)", ha="center", va="top", fontsize=10.5)
-    ax.text(X_H2, 2.15, "Later layers\npurple spots, shapes\n(fine-tuned)", ha="center", va="top",
-            fontsize=10.5)
-    ax.text(X_OUT, 7.45, "Output layer", ha="center", fontsize=13, fontweight="bold", color=RED)
-    ax.text(X_OUT, 7.2, "Softmax\n2 classes", ha="center", va="top", fontsize=10, color="#333")
-    ax.text(X_OUT + 0.38, 5.55, "Parasitized\n98.6%", ha="left", va="center", fontsize=11, fontweight="bold")
-    ax.text(X_OUT + 0.38, 4.15, "Uninfected\n1.4%", ha="left", va="center", fontsize=11)
-
-    # Zoomed-in node
-    ax.add_patch(FancyBboxPatch((11.12, 2.35), 4.76, 4.75, boxstyle="round,pad=0.02,rounding_size=0.15",
-                                linewidth=1, edgecolor="#bbb", facecolor="#f7f7f7", zorder=0))
-    ax.text(13.57, 6.8, "One node (neuron), zoomed in", ha="center", fontsize=12.5, fontweight="bold")
-    cx, cy, R = 13.7, 4.6, 0.95
-    ax.add_patch(plt.Circle((cx, cy), R, color="#333", zorder=2))
-    ax.add_patch(plt.matplotlib.patches.Wedge((cx, cy), R, -90, 90, color="#666", zorder=2))
-    ax.text(cx - 0.47, cy, "Σ wᵢxᵢ + b", ha="center", va="center", fontsize=9.5, color="white", zorder=3)
-    ax.text(cx + 0.47, cy, "f(z)", ha="center", va="center", fontsize=11, color="white", zorder=3)
-    ax.text(cx - 0.62, cy + R + 0.22, "Weighted sum", ha="center", fontsize=9.5, color="#333")
-    ax.text(cx + 0.72, cy + R + 0.22, "Activation", ha="center", fontsize=9.5, color="#333")
-    for label, y in (("x₁", 5.7), ("x₂", 4.6), ("xₙ", 3.5)):
-        ax.text(11.6, y, label, ha="center", va="center", fontsize=12)
-        ax.annotate("", xy=(cx - R * 0.98, cy + (y - cy) * 0.28), xytext=(11.85, y),
-                    arrowprops=dict(arrowstyle="-|>", color="black", lw=1.2))
-    ax.text(11.6, 6.2, "Inputs", ha="center", fontsize=10, color="#333")
-    ax.text(12.35, 6.2, "Weights wᵢ (learned)", ha="left", fontsize=10, color="#333")
-    ax.annotate("", xy=(15.7, cy), xytext=(cx + R, cy), arrowprops=dict(arrowstyle="-|>", color="black", lw=1.2))
-    ax.text(15.2, cy + 0.15, "output", ha="center", fontsize=10)
-    ax.text(13.57, 3.3, "z = Σ wᵢxᵢ + b     output = f(z)", ha="center", va="top", fontsize=10,
-            color="#222")
-    ax.text(13.57, 2.95, "Hidden layers: f = ReLU6\nOutput layer: f = Softmax", ha="center", va="top",
-            fontsize=9.5, color="#333")
+    ax.text(X_IN, 6.35, "Input layer", ha="center", fontsize=16, fontweight="bold", color=GREEN)
+    ax.text(mid, 6.35, "Hidden layers", ha="center", fontsize=16, fontweight="bold", color=BLUE)
+    ax.text(mid, 6.15, "52 convolution layers\n(17 inverted residual blocks)", ha="center", va="top",
+            fontsize=12, color="#333")
+    ax.text(X_OUT, 6.35, "Output layer", ha="center", fontsize=16, fontweight="bold", color=RED)
+    ax.text(X_OUT, 6.15, "Softmax, 2 classes", ha="center", va="top", fontsize=12, color="#333")
+    ax.text(X_IN, 1.6, "49,152 pixel values\n(after Stages 1-5)", ha="center", va="top", fontsize=12)
+    ax.text(X_H1, 1.6, "Early layers\nedges, colours\n(frozen)", ha="center", va="top", fontsize=12)
+    ax.text(X_H2, 1.6, "Later layers\npurple spots, shapes\n(fine-tuned)", ha="center", va="top", fontsize=12)
+    ax.text(X_OUT + 0.45, 4.35, "Parasitized\n98.6%", ha="left", va="center", fontsize=14, fontweight="bold")
+    ax.text(X_OUT + 0.45, 3.2, "Uninfected\n1.4%", ha="left", va="center", fontsize=14)
 
     # Legend
     for i, (name, color) in enumerate((("Input", GREEN), ("Hidden", BLUE), ("Output", RED))):
-        x = 11.75 + i * 1.45
-        ax.add_patch(plt.Circle((x, 1.75), 0.16, color=color))
-        ax.text(x + 0.25, 1.75, name, va="center", fontsize=11.5, fontweight="bold")
+        y = 1.95 - i * 0.38
+        ax.add_patch(plt.Circle((10.0, y), 0.13, color=color))
+        ax.text(10.22, y, name, va="center", fontsize=13, fontweight="bold")
 
     # Training facts
-    ax.add_patch(FancyBboxPatch((0.4, 0.3), 15.2, 0.8, boxstyle="round,pad=0.02,rounding_size=0.1",
+    ax.add_patch(FancyBboxPatch((0.05, 0.12), 11.9, 0.5, boxstyle="round,pad=0.02,rounding_size=0.1",
                                 linewidth=0.8, edgecolor="#ccc", facecolor="#fafafa"))
-    ax.text(8, 0.7, "Pre-trained on ImageNet  ·  Adam  ·  learning rate 0.001 → 0.0001 (fine-tuning)  ·  "
-            "cross-entropy loss  ·  19,282 training images  ·  96.6% test accuracy",
-            ha="center", va="center", fontsize=10.5)
+    ax.text(6, 0.37, "ImageNet pre-trained  ·  Adam  ·  learning rate 0.001 → 0.0001  ·  "
+            "cross-entropy loss  ·  19,282 training images  ·  96.6% accuracy",
+            ha="center", va="center", fontsize=10)
 
-    fig.savefig(OUT / "neural_network.png", dpi=170, facecolor="white", bbox_inches="tight")
+    fig.savefig(OUT / "neural_network.png", dpi=150, facecolor="white", bbox_inches="tight")
     plt.close(fig)
     print("saved", OUT / "neural_network.png")
+
+
+def neuron():
+    """One node of the network in detail (report/assets/neuron.png)."""
+    plt.rcParams["font.family"] = "DejaVu Sans"
+    fig, ax = plt.subplots(figsize=(12, 5))
+    ax.set_xlim(0, 12)
+    ax.set_ylim(0, 5)
+    ax.axis("off")
+
+    ax.text(6, 4.7, "One node (neuron), zoomed in", ha="center", va="center", fontsize=20,
+            fontweight="bold")
+    cx, cy, R = 5.3, 2.45, 1.15
+    ax.add_patch(plt.Circle((cx, cy), R, color="#333", zorder=2))
+    ax.add_patch(plt.matplotlib.patches.Wedge((cx, cy), R, -90, 90, color="#666", zorder=2))
+    ax.text(cx - 0.6, cy, "Σ wᵢxᵢ + b", ha="center", va="center", fontsize=12, color="white", zorder=3)
+    ax.text(cx + 0.56, cy, "f(z)", ha="center", va="center", fontsize=16, color="white", zorder=3)
+    ax.text(cx - 0.9, cy + R + 0.28, "Weighted sum", ha="center", fontsize=13, color="#333")
+    ax.text(cx + 0.95, cy + R + 0.28, "Activation", ha="center", fontsize=13, color="#333")
+
+    ax.text(0.9, 4.0, "Inputs", ha="center", fontsize=14, fontweight="bold", color=GREEN)
+    for label, y in (("x₁", 3.4), ("x₂", 2.45), ("xₙ", 1.3)):
+        ax.text(0.9, y, label, ha="center", va="center", fontsize=17)
+        ax.annotate("", xy=(cx - R * 0.98, cy + (y - cy) * 0.3), xytext=(1.25, y),
+                    arrowprops=dict(arrowstyle="-|>", color="black", lw=1.4))
+    ax.text(0.9, 1.9, "⋮", ha="center", va="center", fontsize=22, color="#555")
+    ax.text(1.4, 0.55, "Weights w₁ … wₙ on the arrows (learned in training)", ha="left", fontsize=13,
+            color="#333")
+
+    ax.annotate("", xy=(7.75, cy), xytext=(cx + R, cy), arrowprops=dict(arrowstyle="-|>", color="black", lw=1.4))
+    ax.text(7.1, cy + 0.2, "output", ha="center", fontsize=14)
+
+    ax.add_patch(FancyBboxPatch((8.0, 0.75), 3.85, 3.35, boxstyle="round,pad=0.02,rounding_size=0.12",
+                                linewidth=0.8, edgecolor="#ccc", facecolor="#f7f7f7"))
+    lines = [("z = Σ wᵢxᵢ + b", True), ("output = f(z)", True), ("", False),
+             ("Hidden layers: f = ReLU6", True), ("ReLU6(z) = min(max(0, z), 6)", False), ("", False),
+             ("Output layer: f = Softmax", True), ("turns the 2 scores into", False),
+             ("probabilities that add up to 1", False)]
+    y = 3.85
+    for text, bold in lines:
+        if text:
+            ax.text(8.2, y, text, ha="left", va="center", fontsize=12.5 if bold else 11.5,
+                    fontweight="bold" if bold else "normal", color="#222" if bold else "#444")
+        y -= 0.34
+
+    fig.savefig(OUT / "neuron.png", dpi=150, facecolor="white", bbox_inches="tight")
+    plt.close(fig)
+    print("saved", OUT / "neuron.png")
 
 
 if __name__ == "__main__":
     main()
     neural_network()
+    neuron()
