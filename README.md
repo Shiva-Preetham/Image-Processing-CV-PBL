@@ -70,6 +70,12 @@ flowchart LR
 | 9 | Classification | Re-use a network trained on 1.2 M photos; retrain its last layers for our task | MobileNetV2 transfer learning, flip/rotate augmentation | **M5** (+M2) |
 | 10 | Evaluation | Test on images the model has never seen | Accuracy, precision, recall, F1, confusion matrix | **CO4** |
 
+### Inside the CNN (Stage 9)
+
+The cleaned cell image enters the input layer, passes through MobileNetV2's 52 convolution layers (early layers frozen, later layers fine-tuned), and the output layer gives the probability of each class. On the right, one neuron is zoomed in: it multiplies its inputs by learned weights, adds a bias and applies an activation function.
+
+<img src="report/assets/neural_network.png" alt="Neural network architecture of the MalariaVision classifier, with one neuron zoomed in" width="100%">
+
 ---
 
 ## 📊 Results (v1.0)
