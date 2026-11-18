@@ -406,6 +406,8 @@ table("Parameters of the image-processing stages", ["Stage", "Parameter", "Value
 h1("9. CLASSIFICATION USING TRANSFER LEARNING");
 h2("9.1 MobileNetV2");
 p("MobileNetV2 [4] is a convolutional neural network designed for mobile devices. It is built from inverted residual blocks with depthwise separable convolutions, which keep the number of parameters and computations low (about 3.5 million parameters). The torchvision implementation pre-trained on ImageNet [9] (about 1.28 million photographs in 1,000 classes) is used. Its early layers already respond to edges, colours, blobs and textures, which are also the features that distinguish a stained parasite. The final 1,000-class layer is replaced by a new fully connected layer with two outputs, Uninfected and Parasitized.");
+p(`Figure ${figureNo + 1} gives a simplified view of the network as used in this project. The 128 × 128 × 3 input image passes through 52 convolution layers (a first convolution, 17 inverted residual blocks and a final 1 × 1 convolution), global average pooling and the new output layer. Every node computes a weighted sum of its inputs plus a bias, z = Σ w_{i}x_{i} + b, and applies an activation function: ReLU6 in the hidden layers and Softmax in the output layer, which turns the two scores into the probabilities of Parasitized and Uninfected. After the output layer is replaced, the network has about 2.2 million parameters.`);
+figure(asset("neural_network.png"), "Neural network architecture of the classifier, with one node shown in detail");
 h2("9.2 Input Preparation");
 p("The input of the network is the 128 × 128 RGB image produced by Stages 2 to 5. The pixel values are scaled to the range 0 to 1 and normalised with the ImageNet channel means (0.485, 0.456, 0.406) and standard deviations (0.229, 0.224, 0.225), as expected by the pre-trained network.");
 h2("9.3 Data Augmentation (Module 2)");
@@ -443,10 +445,10 @@ table("Results of the final model on the test set", ["Metric", "Value", "Meaning
   ["F1-score", pct(M.f1, 2), "Balance of precision and recall"],
 ], [0.25, 0.15, 0.60]);
 h2("10.3 Confusion Matrix");
-p(`Figure 7 shows the confusion matrix. Of the ${n(CM.TP + CM.FN)} infected cells, ${n(CM.TP)} were detected and ${n(CM.FN)} were missed (${pct(CM.FN / (CM.TP + CM.FN))}). Of the ${n(CM.TN + CM.FP)} healthy cells, ${n(CM.TN)} were recognised and ${n(CM.FP)} were reported as infected (${pct(CM.FP / (CM.TN + CM.FP))}). The two kinds of error are of similar size, so the model is not biased towards either class.`);
+p(`Figure ${figureNo + 1} shows the confusion matrix. Of the ${n(CM.TP + CM.FN)} infected cells, ${n(CM.TP)} were detected and ${n(CM.FN)} were missed (${pct(CM.FN / (CM.TP + CM.FN))}). Of the ${n(CM.TN + CM.FP)} healthy cells, ${n(CM.TN)} were recognised and ${n(CM.FP)} were reported as infected (${pct(CM.FP / (CM.TN + CM.FP))}). The two kinds of error are of similar size, so the model is not biased towards either class.`);
 figure(outFig("confusion_matrix.png"), "Confusion matrix of the final model on the test set", 3.6);
 h2("10.4 Training Curves");
-p(`Figure 8 shows the loss and accuracy after each epoch. In Phase A, with only the output layer trained, the validation accuracy reaches ${pct(H[headEpochs - 1].val_acc)}. Fine-tuning in Phase B raises it to ${pct(M.best_val_acc)}. The training and validation curves stay close to each other, which shows that the model has not over-fitted the training images.`);
+p(`Figure ${figureNo + 1} shows the loss and accuracy after each epoch. In Phase A, with only the output layer trained, the validation accuracy reaches ${pct(H[headEpochs - 1].val_acc)}. Fine-tuning in Phase B raises it to ${pct(M.best_val_acc)}. The training and validation curves stay close to each other, which shows that the model has not over-fitted the training images.`);
 figure(outFig("training_curves.png"), "Training and validation loss and accuracy (dashed line: start of fine-tuning)");
 h2("10.5 Improvement Across Versions");
 p("The project was developed in three versions. The baseline used plain histogram equalisation. Version 0.1 replaced it with CLAHE and fine-tuned longer, which reduced the missed infections by more than half. The final version 1.0 was trained on the full dataset and evaluated on a test set more than four times larger.");
